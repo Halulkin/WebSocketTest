@@ -6,43 +6,67 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/send"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="Send"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textColor="@color/colorPrimary"
-        android:textSize="17sp" />
+    <ListView
+        android:id="@+id/messageList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:stackFromBottom="false"
+        android:transcriptMode="alwaysScroll"
+        app:layout_constraintBottom_toTopOf="@+id/btnBomb"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnBomb"
+        android:id="@+id/btnSendMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/send"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="8dp"
-        android:text="Bomb" />
+        android:onClick="btnSendMessage"
+        android:text="Send"
+        android:textColor="@color/colorPrimary"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toTopOf="@id/messageBox"
+        app:layout_constraintEnd_toStartOf="@+id/btnBomb"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btnBomb" />
 
     <EditText
         android:id="@+id/messageBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:hint="Enter a message"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnSendMessage"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/send"
-        android:hint="Enter a message" />
+        app:layout_constraintTop_toTopOf="@+id/btnSendMessage" />
 
-    <ListView
-        android:id="@+id/messageList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/messageBox"
-        app:layout_constraintTop_toTopOf="parent"
-        android:divider="@null"
-        android:dividerHeight="0dp" />
+    <com.kusu.loadingbutton.LoadingButton
+        android:id="@+id/btnBomb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:onClick="btnBombOnClick"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Bomb"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/btnSendMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:lb_buttonColor="@color/colorPrimary"
+        app:lb_isCircular="true"
+        app:lb_isShadowEnable="true"
+        app:lb_shadowColor="@color/colorPrimaryDark"
+        app:lb_shadowHeight="5dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
