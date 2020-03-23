@@ -15,12 +15,9 @@ import java.util.List;
 
 public class MessageAdapter extends BaseAdapter {
 
-    Context context;
-    LayoutInflater inflater;
+    private LayoutInflater inflater;
 
-
-    public MessageAdapter(Context context) {
-        this.context = context;
+    MessageAdapter(Context context) {
         inflater = LayoutInflater.from(context);
     }
 
@@ -65,7 +62,6 @@ public class MessageAdapter extends BaseAdapter {
                 sentMessage.setText(item.getString("message"));
 
                 receivedMessage.setVisibility(View.INVISIBLE);
-
             }
 
         } catch (JSONException e) {

@@ -1,11 +1,15 @@
 package com.lyulya.websockettest;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +18,9 @@ import com.kusu.loadingbutton.LoadingButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     public long endTime;
     public long startTime;
 
+    public JSONObject jsonObject;
+    public int avr, excOld = 0, excNew = 0, counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
         adapter = new MessageAdapter(getApplicationContext());
         messageList.setAdapter(adapter);
 
-
         instantiateWebSocket();
     }
 
@@ -60,54 +68,106 @@ public class MainActivity extends AppCompatActivity {
         OkHttpClient client = new OkHttpClient();
         //replace x.x.x.x with your machine's IP Address
         // Work ip
-//        Request request = new Request.Builder().url("ws://192.168.2.181:8080").build();
+        Request request = new Request.Builder().url("ws://192.168.2.181:8080").build();
         // Dormitory ip
-        Request request = new Request.Builder().url("ws://146.102.205.133:8080").build();
+//        Request request = new Request.Builder().url("ws://146.102.205.133:8080").build();
 
         SocketListener socketListener = new SocketListener(this, adapter);
         webSocket = client.newWebSocket(request, socketListener);
     }
 
     public void btnBombOnClick(View view) {
+        counter++;
 
-        btnBomb.showLoading();
+//        myTask = new MyTask(this);
+//        myTask.execute();
+//        makeBomb();
 
-        Runnable mSomeTask = new Runnable() {
-            public void run() {
+        generateNoteOnSD();
+    }
 
-                List<Integer> list = new ArrayList<>();
-                for (int i = 0; i < 4000; i++) {
-                    int rand = ((int) (Math.random() * 40)) + 1;
-                    list.add(rand);
-                }
+    private void makeBomb() {
+//        btnBomb.showLoading();
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            int rand = ((int) (Math.random() * 65000)) + 1;
+            list.add(rand);
+        }
 
-                startTime = System.currentTimeMillis();
+//        messageBox.setText("");
 
-                for (int i = 0; i < 4000; i++) {
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < 1000; i++) {
+            message = String.valueOf(list.get(i));
+            webSocket.send(message);
+            jsonObject = new JSONObject();
 
-                    message = String.valueOf(list.get(i));
+            try {
+                jsonObject.put("message", message);
+                jsonObject.put("byServer", false);
 
-                    webSocket.send(message);
-                    messageBox.setText("");
+                adapter.addItem(jsonObject);
 
-                    JSONObject jsonObject = new JSONObject();
-
-                    try {
-                        jsonObject.put("message", message);
-                        jsonObject.put("byServer", false);
-
-                        adapter.addItem(jsonObject);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        };
-        mSomeTask.run();
+        }
+
         endTime = System.currentTimeMillis();
-        btnBomb.hideLoading();
-        btnBomb.setText("Total execution time: " + (endTime - startTime));
+//        btnBomb.hideLoading();
+        excNew = (int) (endTime - startTime);
+
+        avr = (excOld + excNew) / counter;
+        excOld = excOld + excNew;
+        tvStatus.setText("Last execution time: " + (excNew) + "\n" + " Average - " + avr);
+        btnBomb.setText(String.valueOf(counter));
+
+    }
+
+    public void sendFile() throws IOException {
+
+    }
+
+    public void generateNoteOnSD() {
+
+        String FILENAME = "hello_file";
+        String sample = "hello my friend!";
+
+        try {
+            // this will create a new name everytime and unique
+            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+            // if external memory exists and folder with name Notes
+            if (!root.exists()) {
+                root.mkdirs(); // this will create folder.
+            }
+            File filepath = new File(root, FILENAME + ".txt");  // file path to save
+            FileWriter writer = new FileWriter(filepath);
+            writer.append(sample);
+            writer.flush();
+            writer.close();
+            String m = "File generated with name " + FILENAME + ".txt";
+
+             Toast.makeText(MainActivity.this, m, Toast.LENGTH_LONG).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(MainActivity.this, e.getMessage().toString(), Toast.LENGTH_LONG).show();
+        }
+
+
+
+//        File file = new File(MainActivity.this.getFilesDir(), "text");
+//        if (!file.exists()) {
+//            file.mkdir();
+//        }
+//        try {
+//            File gpxfile = new File(file, "sample");
+//            FileWriter writer = new FileWriter(gpxfile);
+//            writer.append(string);
+//            writer.flush();
+//            writer.close();
+//            Toast.makeText(MainActivity.this, "Saved your text", Toast.LENGTH_LONG).show();
+//        } catch (Exception e) { }
     }
 
     public void btnSendMessage(View view) {
@@ -116,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             webSocket.send(message);
             messageBox.setText("");
 
-            JSONObject jsonObject = new JSONObject();
+            jsonObject = new JSONObject();
 
             try {
                 jsonObject.put("message", message);
@@ -130,3 +190,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
+

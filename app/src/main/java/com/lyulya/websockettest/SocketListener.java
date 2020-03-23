@@ -1,8 +1,6 @@
 package com.lyulya.websockettest;
 
 import android.graphics.Color;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -30,7 +28,7 @@ public class SocketListener extends WebSocketListener {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                activity.tvStatus.setText("Connection Established!");
+                activity.tvStatus.setText(R.string.onOpenMEssage);
                 activity.tvStatus.setTextColor(Color.GREEN);
             }
         });
@@ -63,7 +61,7 @@ public class SocketListener extends WebSocketListener {
     @Override
     public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
         super.onClosing(webSocket, code, reason);
-        activity.tvStatus.setText("Connection clothing!");
+        activity.tvStatus.setText(R.string.onCloseMessage);
         activity.tvStatus.setTextColor(Color.GREEN);
 
     }
@@ -71,14 +69,14 @@ public class SocketListener extends WebSocketListener {
     @Override
     public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
         super.onClosed(webSocket, code, reason);
-        activity.tvStatus.setText("Connection Closed");
+        activity.tvStatus.setText(R.string.onClothingMessage);
         activity.tvStatus.setTextColor(Color.GREEN);
     }
 
     @Override
     public void onFailure(@NotNull WebSocket webSocket, @NotNull final Throwable t, @Nullable final Response response) {
         super.onFailure(webSocket, t, response);
-        activity.tvStatus.setText("Connection Failure!" + "Code is " + String.valueOf(t) + " Reason is " + response );
+        activity.tvStatus.setText("Connection Failure!" + "Code is " + String.valueOf(t) + " Reason is " + response);
         activity.tvStatus.setTextColor(Color.GREEN);
     }
 }

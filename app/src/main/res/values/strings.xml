@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">WebSocketTest</string>
+    <string name="onOpenMEssage">Connection Established!</string>
+    <string name="onCloseMessage">Connection clothing!</string>
+    <string name="onClothingMessage">Connection Closed</string>
 </resources>
