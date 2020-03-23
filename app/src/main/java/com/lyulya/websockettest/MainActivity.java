@@ -1,9 +1,7 @@
 package com.lyulya.websockettest;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +17,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import java.util.List;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
+import okio.ByteString;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     public JSONObject jsonObject;
     public int avr, excOld = 0, excNew = 0, counter = 0;
+    public File path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
 //        myTask.execute();
 //        makeBomb();
 
-        generateNoteOnSD();
+
+        sendFile();
     }
 
     private void makeBomb() {
@@ -124,50 +127,69 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void sendFile() throws IOException {
+    public void sendFile() {
 
+        generateNoteOnSD();
+
+        File file = new File(path + "/sample.txt");
+
+//        File file = new File(Environment.getExternalStorageDirectory(), "Notes");
+
+        //init array with file length
+        byte[] bytesArray = new byte[(int) file.length()];
+
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            fis.read(bytesArray); //read file into bytes[]
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ByteString byteString = new ByteString(bytesArray);
+
+        webSocket.send(byteString);
     }
 
     public void generateNoteOnSD() {
 
-        String FILENAME = "hello_file";
-        String sample = "hello my friend!";
+        String FILENAME = "sample";
+        String sample = "This is bits of my heart";
+
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            int rand = ((int) (Math.random() * 65000)) + 1;
+            list.add(rand);
+        }
 
         try {
-            // this will create a new name everytime and unique
             File root = new File(Environment.getExternalStorageDirectory(), "Notes");
-            // if external memory exists and folder with name Notes
             if (!root.exists()) {
-                root.mkdirs(); // this will create folder.
+                root.mkdir();
             }
-            File filepath = new File(root, FILENAME + ".txt");  // file path to save
+            File filepath = new File(root, FILENAME + ".txt");
             FileWriter writer = new FileWriter(filepath);
             writer.append(sample);
             writer.flush();
             writer.close();
             String m = "File generated with name " + FILENAME + ".txt";
 
-             Toast.makeText(MainActivity.this, m, Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, m, Toast.LENGTH_LONG).show();
+            path = root;
 
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(MainActivity.this, e.getMessage().toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
-
-
-
-//        File file = new File(MainActivity.this.getFilesDir(), "text");
-//        if (!file.exists()) {
-//            file.mkdir();
-//        }
-//        try {
-//            File gpxfile = new File(file, "sample");
-//            FileWriter writer = new FileWriter(gpxfile);
-//            writer.append(string);
-//            writer.flush();
-//            writer.close();
-//            Toast.makeText(MainActivity.this, "Saved your text", Toast.LENGTH_LONG).show();
-//        } catch (Exception e) { }
     }
 
     public void btnSendMessage(View view) {
